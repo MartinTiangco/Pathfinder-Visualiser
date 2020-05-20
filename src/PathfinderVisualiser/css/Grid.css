@@ -1,0 +1,10 @@
+.grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 5% auto;
+}
+
+.column {
+  height: 25px;
+}
