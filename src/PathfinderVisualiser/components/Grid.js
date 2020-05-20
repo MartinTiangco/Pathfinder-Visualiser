@@ -30,11 +30,31 @@ export default class Grid extends Component {
     const startNode = grid[START_NODE_ROW][START_NODE_COL];
     const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
     const visitedNodes = Dijkstra(startNode, finishNode, grid);
-    this.showAnimation(visitedNodes);
-    this.showPath(finishNode);
+    this.showAnimation(visitedNodes, finishNode);
   };
 
-  showPath = (finishNode) => {
+  showAnimation = (visitedNodes, finishNode) => {
+    for (let i = 0; i <= visitedNodes.length; i++) {
+      // we have completed the loop, now we animate the shortest path
+      if (i == visitedNodes.length) {
+        setTimeout(() => {
+          this.getShortestPath(finishNode);
+        }, 10 * i);
+        return;
+      }
+
+      // loop through all the visited nodes
+      setTimeout(() => {
+        const { row, col } = visitedNodes[i];
+        // get the node from the HTML dom with the ID
+        document
+          .getElementById(`row-${row}-col-${col}`)
+          .classList.add("node-visited");
+      }, 10 * i);
+    }
+  };
+
+  getShortestPath = (finishNode) => {
     let shortestPathInOrder = [];
     shortestPathInOrder.push(finishNode);
     let currentNode = finishNode;
@@ -54,28 +74,16 @@ export default class Grid extends Component {
         document
           .getElementById(`row-${row}-col-${col}`)
           .classList.add("node-path");
-      }, 10 * i);
-    }
-  };
-
-  showAnimation = (visitedNodes) => {
-    for (let i = 0; i < visitedNodes.length; i++) {
-      setTimeout(() => {
-        const { row, col } = visitedNodes[i];
-        // get the node from the HTML dom with the ID
-        document
-          .getElementById(`row-${row}-col-${col}`)
-          .classList.add("node-visited");
-      }, 10 * i);
+      }, 50 * i);
     }
   };
 
   // creates the grid at startup
-  createInitialGrid = (row, col) => {
+  createInitialGrid = (rows, cols, random = false) => {
     let grid = [];
-    for (let i = 0; i < row; i++) {
+    for (let i = 0; i < rows; i++) {
       let currentRow = [];
-      for (let j = 0; j < col; j++) {
+      for (let j = 0; j < cols; j++) {
         currentRow.push(this.createNode(i, j));
       }
       grid.push(currentRow);
@@ -126,6 +134,7 @@ export default class Grid extends Component {
                       col={col}
                       isStart={isStart}
                       isFinish={isFinish}
+                      isWall={isWall}
                     />
                   );
                 })}
