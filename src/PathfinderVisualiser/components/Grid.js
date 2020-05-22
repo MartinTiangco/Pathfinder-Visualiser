@@ -18,21 +18,34 @@ export default class Grid extends Component {
       grid: [],
       rowSize: ROW_SIZE,
       colSize: COL_SIZE,
+      startNodeCoords: { startRow: 0, startCol: 0 },
+      finishNodeCoords: { finishRow: 0, finishCol: 0 },
     };
   }
 
   componentDidMount() {
-    this.createInitialGrid(ROW_SIZE, COL_SIZE);
+    this.createInitialGrid(ROW_SIZE, COL_SIZE, true, true);
+    this.createMaze();
   }
 
+  /**
+   * This method uses Dijkstra's Algorithm on the grid and shows the process visually.
+   */
   handleVisualiseDijkstra = () => {
-    const { grid } = this.state;
-    const startNode = grid[START_NODE_ROW][START_NODE_COL];
-    const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL];
-    const visitedNodes = Dijkstra(startNode, finishNode, grid);
+    const { grid, startNodeCoords, finishNodeCoords } = this.state;
+    const { startRow, startCol } = startNodeCoords;
+    const { finishRow, finishCol } = finishNodeCoords;
+    const startNode = grid[startRow][startCol];
+    const finishNode = grid[finishRow][finishCol];
+    const visitedNodes = Dijkstra(startNode, finishNode, grid); // returns an array of visited nodes with the shortest path
     this.showAnimation(visitedNodes, finishNode);
   };
 
+  /**
+   * This method actually handles the animation of Dijkstra by editing the classNames of the nodes that were visited.
+   * visitedNodes - array of nodes that were visited, retrieved from Dijkstra's Algorithm
+   * finishNode - singular node object that marks the finish
+   */
   showAnimation = (visitedNodes, finishNode) => {
     for (let i = 0; i <= visitedNodes.length; i++) {
       // we have completed the loop, now we animate the shortest path
@@ -54,18 +67,30 @@ export default class Grid extends Component {
     }
   };
 
+  /**
+   * This method finds the shortest path by using the node object's LastVisited property.
+   * It begins with the finishNode and backtracks all the way to the startNode. It creates an array from all
+   * the nodes from the finishNode to the startNode, then reverses that array.
+   * finishNode - singular node object that marks the finish
+   */
   getShortestPath = (finishNode) => {
     let shortestPathInOrder = [];
-    shortestPathInOrder.push(finishNode);
+    shortestPathInOrder.push(finishNode); // finishNode is first
     let currentNode = finishNode;
+
+    // Iterate through all the nodes that were visited last until we have reached the startNode.
+    // In other words, backtrack from the finishNode to the startNode.
     while (currentNode.lastNode !== null) {
       shortestPathInOrder.push(currentNode.lastNode);
       currentNode = currentNode.lastNode;
     }
-    shortestPathInOrder.reverse();
-    this.animatePath(shortestPathInOrder);
+    shortestPathInOrder.reverse(); // reverses the array
+    this.animatePath(shortestPathInOrder); // animates the shortest path
   };
 
+  /**
+   * Once we have the shortest path, we animate it by using the class "node-path".
+   */
   animatePath = (shortestPathInOrder) => {
     for (let i = 0; i < shortestPathInOrder.length; i++) {
       setTimeout(() => {
@@ -78,27 +103,82 @@ export default class Grid extends Component {
     }
   };
 
-  // creates the grid at startup
-  createInitialGrid = (rows, cols, random = false) => {
+  /**
+   * Creates the initial grid at startup and whenever the user clicks the reset button.
+   * rows - the number of rows of the grid
+   * cols - the number of cols of the grid
+   * random (Default = false) - whether or not the startNode and finishNode are decided randomly.
+   * firstLoad (Default = false) - this should be true upon the first load of the app. Upon reset, this is false.
+   */
+  createInitialGrid = (rows, cols, random = false, firstLoad = false) => {
+    // clears the node-visited classname of all the nodes
+    if (!firstLoad) {
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          document.getElementById(`row-${i}-col-${j}`).className = "node";
+        }
+      }
+    }
+
+    let startRow = null;
+    let startCol = null;
+    let finishRow = null;
+    let finishCol = null;
+
+    // this block executes if the random startNode and finishNode mode is chosen.
+    if (random) {
+      // chooses a random start node
+      startRow = Math.floor(Math.random() * rows);
+      startCol = Math.floor(Math.random() * cols);
+      // chooses a random finish node
+      finishRow = Math.floor(Math.random() * rows);
+      finishCol = Math.floor(Math.random() * cols);
+      while (startRow === finishRow)
+        finishRow = Math.floor(Math.random() * rows);
+      while (startCol === finishCol)
+        finishCol = Math.floor(Math.random() * cols);
+    }
+
     let grid = [];
     for (let i = 0; i < rows; i++) {
       let currentRow = [];
       for (let j = 0; j < cols; j++) {
-        currentRow.push(this.createNode(i, j));
+        currentRow.push(
+          this.createNode(i, j, startRow, startCol, finishRow, finishCol)
+        );
       }
       grid.push(currentRow);
     }
 
-    this.setState({ grid });
+    this.setState(
+      {
+        grid,
+        startNodeCoords: { startRow, startCol },
+        finishNodeCoords: { finishRow, finishCol },
+      },
+      () => console.log(grid)
+    );
   };
 
-  // creates a singular node
-  createNode = (row, col) => {
+  /**
+   * Creates a singular node object.
+   * row, col - coordinates of the node
+   * startRow, startCol (Default: START_NODE_ROW, START_NODE_COL) - coordinates of startNode
+   * finishRow, finishCol (Default: FINISH_NODE_ROW, FINISH_NODE_COL) - coordinates of finishNode
+   */
+  createNode = (
+    row,
+    col,
+    startRow = START_NODE_ROW,
+    startCol = START_NODE_COL,
+    finishRow = FINISH_NODE_ROW,
+    finishCol = FINISH_NODE_COL
+  ) => {
     return {
       row,
       col,
-      isStart: row === START_NODE_ROW && col === START_NODE_COL,
-      isFinish: row === FINISH_NODE_ROW && col === FINISH_NODE_COL,
+      isStart: row === startRow && col === startCol,
+      isFinish: row === finishRow && col === finishCol,
       isWall: false,
       isVisited: false,
       distance: Infinity,
@@ -112,6 +192,11 @@ export default class Grid extends Component {
       <>
         <button onClick={this.handleVisualiseDijkstra}>
           Visualise Dijkstra's Algorithm!
+        </button>
+        <button
+          onClick={() => this.createInitialGrid(ROW_SIZE, COL_SIZE, true)}
+        >
+          Reset
         </button>
         <div className="grid">
           {grid.map((row, rowIdx) => {
@@ -135,6 +220,7 @@ export default class Grid extends Component {
                       isStart={isStart}
                       isFinish={isFinish}
                       isWall={isWall}
+                      isVisited={isVisited}
                     />
                   );
                 })}
