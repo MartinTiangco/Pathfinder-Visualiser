@@ -10,7 +10,8 @@ export function Dijkstra(startNode, finishNode, grid) {
     const closestNode = unvisitedNodes.shift(); // removes the first element of unvisitedNodes
 
     // if closestNode is a wall, we continue because we can't do anything about it
-    console.log(closestNode);
+    if (closestNode.isWall) continue;
+
     closestNode.isVisited = true;
     visitedNodes.push(closestNode);
     if (closestNode === finishNode) break;
