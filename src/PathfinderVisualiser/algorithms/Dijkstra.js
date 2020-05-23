@@ -1,6 +1,6 @@
 /*
-Returns a list of visited nodes with least cost by using the Dijkstra's algorithm.
-*/
+ * Returns a list of visited nodes with least cost by using the Dijkstra's algorithm.
+ */
 export function Dijkstra(startNode, finishNode, grid) {
   let visitedNodes = [startNode];
   startNode.distance = 0;
@@ -22,6 +22,9 @@ export function Dijkstra(startNode, finishNode, grid) {
   return visitedNodes;
 }
 
+/**
+ * Updates neighbouring nodes that are unvisited to have distance of 0 and update their lastNode property to be the current node
+ */
 function updateUnvisited(node, grid) {
   // in the grid, we find the node
   // mark the nodes adjacent to it with distance = 1
@@ -32,6 +35,10 @@ function updateUnvisited(node, grid) {
   });
 }
 
+/**
+ * Get the unvisited neighbours one spot above, below, to the left, right of the current node.
+ * Return neighbourNodes, an array of nodes that are unvisited
+ */
 function getUnvisitedNeighbours(node, grid) {
   let neighbourNodes = [];
   const { row, col } = node;
@@ -47,12 +54,18 @@ function getUnvisitedNeighbours(node, grid) {
   return neighbourNodes;
 }
 
+/**
+ * Sorts the nodes by ascending distance order
+ */
 function sortByDistance(nodes) {
   nodes.sort((nodeA, nodeB) => {
     return nodeA.distance - nodeB.distance;
   });
 }
 
+/**
+ * Collects all nodes in the grid.
+ */
 function collectAllNodes(grid) {
   let nodes = [];
   for (const row of grid) {
