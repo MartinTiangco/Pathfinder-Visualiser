@@ -12,6 +12,8 @@ export function Dijkstra(startNode, finishNode, grid) {
     // if closestNode is a wall, we continue because we can't do anything about it
     if (closestNode.isWall) continue;
 
+    if (closestNode.distance === Infinity) return visitedNodes;
+
     closestNode.isVisited = true;
     visitedNodes.push(closestNode);
     if (closestNode === finishNode) break;

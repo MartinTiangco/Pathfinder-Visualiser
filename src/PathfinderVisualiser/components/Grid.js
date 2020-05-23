@@ -4,8 +4,8 @@ import "../css/Grid.css";
 import { Dijkstra } from "../algorithms/Dijkstra";
 
 // Constants
-const ROW_SIZE = 5;
-const COL_SIZE = 5;
+const ROW_SIZE = 7;
+const COL_SIZE = 10;
 const START_NODE_COL = 0;
 const START_NODE_ROW = 0;
 const FINISH_NODE_COL = 1;
@@ -73,6 +73,7 @@ export default class Grid extends Component {
    */
   getShortestPath = (finishNode) => {
     let shortestPathInOrder = [];
+    if (finishNode.isVisited === false) return;
     shortestPathInOrder.push(finishNode); // finishNode is first
     let currentNode = finishNode;
 
@@ -114,38 +115,7 @@ export default class Grid extends Component {
         node.classList.remove(`node-visited`);
       }
     }
-
-    const rows = ROW_SIZE,
-      cols = COL_SIZE;
-    let grid = [];
-    for (let i = 0; i < rows; i++) {
-      let currentRow = [];
-      for (let j = 0; j < cols; j++) {
-        currentRow.push(this.createNode(i, j));
-      }
-      grid.push(currentRow);
-    }
-    this.createInitialGrid(rows, cols, true);
-
-    // let startNode = { row: START_NODE_ROW, col: START_NODE_COL };
-    // let finishNode = { row: FINISH_NODE_ROW, col: FINISH_NODE_COL };
-
-    // // randomises the start and finish nodes
-    // startNode = this.randomiseNodePosition(rows, cols, startNode);
-    // finishNode = this.randomiseNodePosition(rows, cols, finishNode);
-    // while (
-    //   finishNode.row === startNode.row &&
-    //   finishNode.col === startNode.col
-    // ) {
-    //   finishNode = this.randomiseNodePosition(rows, cols, finishNode);
-    // }
-
-    // this.setStartAndFinish(grid, startNode, finishNode);
-    // this.setState({
-    //   grid,
-    //   startNodeCoords: startNode,
-    //   finishNodeCoords: finishNode,
-    // });
+    this.createInitialGrid(ROW_SIZE, COL_SIZE, true);
   };
 
   /**
@@ -181,6 +151,8 @@ export default class Grid extends Component {
     }
 
     this.setStartAndFinish(grid, startNode, finishNode);
+
+    this.buildWalls(grid);
 
     this.setState({
       grid,
@@ -219,7 +191,8 @@ export default class Grid extends Component {
       cols = grid[0].length;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        if (i === 0) {
+        // insert algorithm here
+        if (Math.random() * 10 > 7) {
           const currentNode = grid[i][j];
           if (currentNode.isStart === true || currentNode.isFinish === true) {
             continue;
