@@ -73,7 +73,7 @@ export default class Grid extends Component {
    */
   getShortestPath = (finishNode) => {
     let shortestPathInOrder = [];
-    if (finishNode.isVisited === false) return;
+    if (finishNode.isVisited === false) return; // if finishNode is blocked by walls
     shortestPathInOrder.push(finishNode); // finishNode is first
     let currentNode = finishNode;
 
@@ -152,8 +152,6 @@ export default class Grid extends Component {
 
     this.setStartAndFinish(grid, startNode, finishNode);
 
-    this.buildWalls(grid);
-
     this.setState({
       grid,
       startNodeCoords: { row: startNode.row, col: startNode.col },
@@ -201,6 +199,21 @@ export default class Grid extends Component {
         }
       }
     }
+    this.setState({ grid });
+  };
+
+  clearWalls = (grid) => {
+    const rows = grid.length;
+    const cols = grid[0].length;
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        let currentNode = grid[i][j];
+        if (currentNode.isWall) {
+          grid[i][j].isWall = false;
+        }
+      }
+    }
+    this.setState({ grid });
   };
 
   /**
@@ -216,9 +229,13 @@ export default class Grid extends Component {
       isVisited: false,
       distance: Infinity,
       lastNode: null,
+      isWall: false,
     };
   };
 
+  handleMouseDown = () => {
+    console.log("DOWN");
+  };
   render() {
     const { grid } = this.state;
     return (
@@ -227,6 +244,8 @@ export default class Grid extends Component {
           Visualise Dijkstra's Algorithm!
         </button>
         <button onClick={this.resetNodes}>Reset</button>
+        <button onClick={() => this.buildWalls(grid)}>Build Walls</button>
+        <button onClick={() => this.clearWalls(grid)}>Clear Walls</button>
         <div className="grid" ref={this.grid}>
           {grid.map((row, rowIdx) => {
             return (
