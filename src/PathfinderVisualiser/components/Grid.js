@@ -4,8 +4,8 @@ import "../css/Grid.css";
 import { Dijkstra } from "../algorithms/Dijkstra";
 
 // Constants
-const ROW_SIZE = 7;
-const COL_SIZE = 10;
+const ROW_SIZE = 3;
+const COL_SIZE = 3;
 const START_NODE_COL = 0;
 const START_NODE_ROW = 0;
 const FINISH_NODE_COL = 1;
@@ -20,6 +20,7 @@ export default class Grid extends Component {
       colSize: COL_SIZE,
       startNodeCoords: { row: 0, col: 0 },
       finishNodeCoords: { row: 0, col: 0 },
+      mouseDown: false,
     };
     this.grid = React.createRef();
   }
@@ -202,9 +203,12 @@ export default class Grid extends Component {
     this.setState({ grid });
   };
 
+  /**
+   * Clear all walls from the grid.
+   */
   clearWalls = (grid) => {
-    const rows = grid.length;
-    const cols = grid[0].length;
+    const rows = grid.length,
+      cols = grid[0].length;
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         let currentNode = grid[i][j];
@@ -233,9 +237,28 @@ export default class Grid extends Component {
     };
   };
 
-  handleMouseDown = () => {
-    console.log("DOWN");
+  handleMouseUp = (row, col) => {
+    const { grid, mouseDown } = this.state;
+    if (!mouseDown) {
+      return;
+    }
+    console.log("Mouse is up at", row, col);
+    this.setState({ mouseDown: false });
   };
+
+  handleMouseEnter = (row, col) => {
+    const { grid, mouseDown } = this.state;
+    if (!mouseDown) {
+      return;
+    }
+    console.log("Mouse enters", row, col);
+  };
+
+  handleMouseDown = (row, col) => {
+    console.log("Mouse is down at", row, col);
+    this.setState({ mouseDown: true });
+  };
+
   render() {
     const { grid } = this.state;
     return (
@@ -246,6 +269,9 @@ export default class Grid extends Component {
         <button onClick={this.resetNodes}>Reset</button>
         <button onClick={() => this.buildWalls(grid)}>Build Walls</button>
         <button onClick={() => this.clearWalls(grid)}>Clear Walls</button>
+        <button onClick={() => this.placeStartFinishNodes()}>
+          Place Start and Finish
+        </button>
         <div className="grid" ref={this.grid}>
           {grid.map((row, rowIdx) => {
             return (
@@ -269,6 +295,9 @@ export default class Grid extends Component {
                       isFinish={isFinish}
                       isWall={isWall}
                       isVisited={isVisited}
+                      onMouseDown={this.handleMouseDown}
+                      onMouseUp={this.handleMouseUp}
+                      onMouseEnter={this.handleMouseEnter}
                     />
                   );
                 })}

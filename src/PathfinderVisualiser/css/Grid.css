@@ -3,6 +3,7 @@
   flex-direction: column;
   align-items: center;
   margin: 5% auto;
+  pointer-events: none;
 }
 
 .column {
