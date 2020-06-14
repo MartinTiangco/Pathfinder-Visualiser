@@ -1,43 +1,82 @@
 import React, { Component } from "react";
+import { withGetScreen } from "react-getscreen";
 import Node from "./Node";
 import "../css/Grid.css";
 import { Dijkstra } from "../algorithms/Dijkstra";
+import Card from "react-bootstrap/Card";
+import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
+import NavDropdown from "react-bootstrap/NavDropdown";
+import Button from "react-bootstrap/Button";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
 // Constants
-const ROW_SIZE = 3;
-const COL_SIZE = 3;
-const START_NODE_COL = 0;
-const START_NODE_ROW = 0;
-const FINISH_NODE_COL = 1;
-const FINISH_NODE_ROW = 1;
+const ROW_SIZE_DESKTOP = 20,
+  COL_SIZE_DESKTOP = 50,
+  ROW_SIZE_TABLET = 15,
+  COL_SIZE_TABLET = 15,
+  ROW_SIZE_MOBILE = 18,
+  COL_SIZE_MOBILE = 10,
+  START_NODE_COL = 0,
+  START_NODE_ROW = 0,
+  FINISH_NODE_COL = 1,
+  FINISH_NODE_ROW = 1;
 
-export default class Grid extends Component {
+class Grid extends Component {
   constructor(props) {
     super(props);
     this.state = {
       grid: [],
-      rowSize: ROW_SIZE,
-      colSize: COL_SIZE,
+      rowSize: 0,
+      colSize: 0,
       startNodeCoords: { row: 0, col: 0 },
       finishNodeCoords: { row: 0, col: 0 },
       mouseDown: false,
+      screenWidth: null,
+      isRunning: false,
+      canReset: true,
+      algorithmTitle: "Choose an algorithm",
     };
     this.grid = React.createRef();
   }
 
   componentDidMount() {
-    this.createInitialGrid(ROW_SIZE, COL_SIZE, true);
+    const rowSize = this.props.isMobile()
+      ? ROW_SIZE_MOBILE
+      : this.props.isTablet()
+      ? ROW_SIZE_TABLET
+      : ROW_SIZE_DESKTOP;
+    const colSize = this.props.isMobile()
+      ? COL_SIZE_MOBILE
+      : this.props.isTablet()
+      ? COL_SIZE_TABLET
+      : COL_SIZE_DESKTOP;
+    this.createInitialGrid(rowSize, colSize, true);
+    this.setState({
+      rowSize,
+      colSize,
+    });
   }
 
   /**
    * This method uses Dijkstra's Algorithm on the grid and shows the process visually.
    */
   handleVisualiseDijkstra = () => {
-    const { grid, startNodeCoords, finishNodeCoords } = this.state;
-    const startNode = grid[startNodeCoords.row][startNodeCoords.col];
-    const finishNode = grid[finishNodeCoords.row][finishNodeCoords.col];
-    const visitedNodes = Dijkstra(startNode, finishNode, grid); // returns an array of visited nodes with the shortest path
-    this.showAnimation(visitedNodes, finishNode);
+    this.setState(
+      {
+        isRunning: true,
+        canReset: false,
+      },
+      () => {
+        const { grid, startNodeCoords, finishNodeCoords } = this.state;
+        const startNode = grid[startNodeCoords.row][startNodeCoords.col];
+        const finishNode = grid[finishNodeCoords.row][finishNodeCoords.col];
+        const visitedNodes = Dijkstra(startNode, finishNode, grid); // returns an array of visited nodes with the shortest path
+        this.showAnimation(visitedNodes, finishNode);
+      }
+    );
   };
 
   /**
@@ -74,7 +113,11 @@ export default class Grid extends Component {
    */
   getShortestPath = (finishNode) => {
     let shortestPathInOrder = [];
-    if (finishNode.isVisited === false) return; // if finishNode is blocked by walls
+    if (finishNode.isVisited === false) {
+      // if finishNode is blocked by walls
+      this.setState({ canReset: true });
+      return;
+    }
     shortestPathInOrder.push(finishNode); // finishNode is first
     let currentNode = finishNode;
 
@@ -92,7 +135,14 @@ export default class Grid extends Component {
    * Once we have the shortest path, we animate it by using the class "node-path".
    */
   animatePath = (shortestPathInOrder) => {
-    for (let i = 0; i < shortestPathInOrder.length; i++) {
+    for (let i = 0; i <= shortestPathInOrder.length; i++) {
+      if (i === shortestPathInOrder.length) {
+        setTimeout(() => {
+          this.setState({ canReset: true });
+        }, 50 * i);
+        return;
+      }
+
       setTimeout(() => {
         const { row, col } = shortestPathInOrder[i];
         // get the node from the HTML dom with the ID
@@ -116,7 +166,22 @@ export default class Grid extends Component {
         node.classList.remove(`node-visited`);
       }
     }
-    this.createInitialGrid(ROW_SIZE, COL_SIZE, true);
+    const rowSize = this.props.isMobile()
+      ? ROW_SIZE_MOBILE
+      : this.props.isTablet()
+      ? ROW_SIZE_TABLET
+      : ROW_SIZE_DESKTOP;
+    const colSize = this.props.isMobile()
+      ? COL_SIZE_MOBILE
+      : this.props.isTablet()
+      ? COL_SIZE_TABLET
+      : COL_SIZE_DESKTOP;
+    this.createInitialGrid(rowSize, colSize, true);
+    this.setState({
+      rowSize,
+      colSize,
+      isRunning: false,
+    });
   };
 
   /**
@@ -131,14 +196,55 @@ export default class Grid extends Component {
 
     // randomises the start and finish nodes
     if (random) {
-      startNode = this.randomiseNodePosition(rows, cols, startNode);
-      finishNode = this.randomiseNodePosition(rows, cols, finishNode);
-      while (
-        finishNode.row === startNode.row &&
-        finishNode.col === startNode.col
-      ) {
-        finishNode = this.randomiseNodePosition(rows, cols, finishNode);
+      // In mobile, we pick either the first 3 rows or the last 3 rows to be the startNode and endNode's positions.
+      // e.g. startNode can either be on the top or bottom 3 rows - the endNode gets to be in the other end
+      // First, we pick either the top or bottom for startNode
+      if (this.props.isMobile()) {
+        const choice = Math.floor(Math.random * 1);
+        if (choice === 0) {
+          startNode = this.randomiseNodePosition(0, 3, 0, cols, startNode); // start will be in the top rows
+          finishNode = this.randomiseNodePosition(
+            rows - 3,
+            rows,
+            0,
+            cols,
+            finishNode
+          ); // finish will be in the bottom rows
+        } else {
+          startNode = this.randomiseNodePosition(
+            rows - 3,
+            rows,
+            0,
+            cols,
+            startNode
+          ); // start will be in the bottom rows
+          finishNode = this.randomiseNodePosition(0, 3, 0, cols, finishNode); // finish will be in the far left
+        }
+      } else {
+        // the screen is either desktop or tablet mode
+        const choice = Math.floor(Math.random * 1);
+        if (choice === 0) {
+          startNode = this.randomiseNodePosition(0, rows, 0, 5, startNode); // start will be in the top rows
+          finishNode = this.randomiseNodePosition(
+            0,
+            rows,
+            cols - 5,
+            cols,
+            finishNode
+          ); // finish will be in the bottom rows
+        } else {
+          startNode = this.randomiseNodePosition(
+            0,
+            rows,
+            cols - 5,
+            cols,
+            startNode
+          ); // start will be in the bottom rows
+          finishNode = this.randomiseNodePosition(0, rows, 0, 5, finishNode); // finish will be in the top rows
+        }
       }
+      console.log("Start node: " + startNode.row, startNode.col);
+      console.log("End node: " + finishNode.row, finishNode.col);
     }
 
     // creates the initial grid
@@ -166,11 +272,14 @@ export default class Grid extends Component {
   /**
    * Randomises the position for a node.
    */
-  randomiseNodePosition = (rows, cols, node) => {
+  randomiseNodePosition = (startRow, endRow, startCol, endCol, node) => {
     let { row, col } = node;
-    // chooses a random position
-    row = Math.floor(Math.random() * rows);
-    col = Math.floor(Math.random() * cols);
+    // chooses a random row
+    const randomRow = Math.floor(Math.random() * (endRow - startRow)) + 1;
+    row = endRow - randomRow;
+    // chooses random col
+    const randomCol = Math.floor(Math.random() * (endCol - startCol)) + 1;
+    col = endCol - randomCol;
     return { row, col };
   };
 
@@ -191,7 +300,7 @@ export default class Grid extends Component {
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         // insert algorithm here
-        if (Math.random() * 10 > 7) {
+        if (Math.random() * 10 > 9) {
           const currentNode = grid[i][j];
           if (currentNode.isStart === true || currentNode.isFinish === true) {
             continue;
@@ -223,7 +332,7 @@ export default class Grid extends Component {
   /**
    * Creates a singular node object.
    * row, col - coordinates of the node
-   * */
+   */
   createNode = (row, col) => {
     return {
       row,
@@ -259,19 +368,99 @@ export default class Grid extends Component {
     this.setState({ mouseDown: true });
   };
 
+  chooseAlgorithm = (name) => {
+    this.setState({ algorithmTitle: name });
+  };
+
   render() {
     const { grid } = this.state;
     return (
       <>
-        <button onClick={this.handleVisualiseDijkstra}>
-          Visualise Dijkstra's Algorithm!
-        </button>
-        <button onClick={this.resetNodes}>Reset</button>
-        <button onClick={() => this.buildWalls(grid)}>Build Walls</button>
-        <button onClick={() => this.clearWalls(grid)}>Clear Walls</button>
-        <button onClick={() => this.placeStartFinishNodes()}>
-          Place Start and Finish
-        </button>
+        <Navbar
+          sticky="top"
+          collapseOnSelect
+          expand="lg"
+          bg="dark"
+          variant="dark"
+        >
+          <Navbar.Brand href="#home">
+            Pathfinder Visualiser by Martin Tiangco
+          </Navbar.Brand>
+          <Nav className="col-auto">
+            <NavDropdown
+              title={this.state.algorithmTitle}
+              id="collasible-nav-dropdown"
+            >
+              <NavDropdown.Item
+                onClick={() => this.chooseAlgorithm("Breadth-first Search")}
+                active={this.state.algorithmTitle === "Breadth-first Search"}
+                href="#"
+              >
+                Breadth-first Search
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item
+                onClick={() => this.chooseAlgorithm("Depth-first Search")}
+                active={this.state.algorithmTitle === "Depth-first Search"}
+                href="#"
+              >
+                Depth-first Search
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item
+                onClick={() => this.chooseAlgorithm("Dijkstra's Algorithm")}
+                active={this.state.algorithmTitle === "Dijkstra's Algorithm"}
+                href="#"
+              >
+                Djikstra's Algorithm
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item
+                onClick={() => this.chooseAlgorithm("A* Algorithm")}
+                active={this.state.algorithmTitle === "A* Algorithm"}
+                href="#"
+              >
+                A* Algorithm
+              </NavDropdown.Item>
+            </NavDropdown>
+          </Nav>
+          <Nav className="col-auto">
+            <Button
+              variant="success"
+              onClick={this.handleVisualiseDijkstra}
+              disabled={this.state.isRunning}
+            >
+              Start visualising!
+            </Button>
+          </Nav>
+          <Nav className="col-auto">
+            <Button
+              variant="info"
+              onClick={this.resetNodes}
+              disabled={!this.state.canReset}
+            >
+              Reset
+            </Button>
+          </Nav>
+          <Nav className="col-auto">
+            <Button
+              variant="info"
+              onClick={() => this.buildWalls(grid)}
+              disabled={this.state.isRunning}
+            >
+              Build Walls
+            </Button>
+          </Nav>
+          <Nav className="col-auto">
+            <Button
+              variant="info"
+              onClick={() => this.clearWalls(grid)}
+              disabled={this.state.isRunning}
+            >
+              Clear Walls
+            </Button>
+          </Nav>
+        </Navbar>
         <div className="grid" ref={this.grid}>
           {grid.map((row, rowIdx) => {
             return (
@@ -305,7 +494,21 @@ export default class Grid extends Component {
             );
           })}
         </div>
+        {/* Icons made by{" "}
+        <a
+          href="https://www.flaticon.com/authors/pixel-perfect"
+          title="Pixel perfect"
+        >
+          Pixel perfect
+        </a>{" "}
+        from{" "}
+        <a href="https://www.flaticon.com/" title="Flaticon">
+          {" "}
+          www.flaticon.com
+        </a> */}
       </>
     );
   }
 }
+
+export default withGetScreen(Grid);

@@ -2,3 +2,8 @@
   margin: 0;
   padding: 0;
 }
+
+.App {
+  height: 100vh;
+  /* background-color: #474747; */
+}
