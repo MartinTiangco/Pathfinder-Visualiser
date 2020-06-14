@@ -8,21 +8,102 @@
 }
 
 .node-start {
-  background-color: green;
+  background-image: url("./../assets/start.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  animation-name: reveal;
+  animation-duration: 0.5s;
+  animation-delay: 0.25s;
+  animation-timing-function: ease-out;
+  animation-iteration-count: 3;
+  animation-fill-mode: forwards;
 }
 
 .node-finish {
-  background-color: red;
+  background-image: url("./../assets/finish.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  animation-name: reveal;
+  animation-duration: 0.5s;
+  animation-delay: 0.25s;
+  animation-timing-function: ease-out;
+  animation-iteration-count: 3;
+  animation-fill-mode: forwards;
+}
+
+@keyframes reveal {
+  0% {
+    transform: scale(2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .node-wall {
-  background-color: grey;
+  background-color: #081b2e;
+  animation-name: reveal;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
 }
 
 .node-visited {
   background-color: lightgreen;
+  animation-name: visitedAnimation;
+  animation-duration: 0.25s;
+  animation-timing-function: ease-out;
+  animation-delay: 0;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+@keyframes visitedAnimation {
+  0% {
+    transform: scale(0.3);
+    background-color: #004433;
+  }
+
+  50% {
+    background-color: #006c44;
+  }
+
+  75% {
+    transform: scale(1.2);
+    background-color: #00ac6d;
+  }
+
+  100% {
+    transform: scale(1);
+    background-color: #00d386;
+  }
 }
 
 .node-path {
-  background-color: gold;
+  animation-name: shortestPath;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-out;
+  animation-direction: alternate;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+}
+
+@keyframes shortestPath {
+  0% {
+    transform: scale(0.6);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+    background-color: #fff66f;
+  }
 }
