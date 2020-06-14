@@ -14,7 +14,7 @@ import Col from "react-bootstrap/Col";
 
 // Constants
 const ROW_SIZE_DESKTOP = 20,
-  COL_SIZE_DESKTOP = 50,
+  COL_SIZE_DESKTOP = 40,
   ROW_SIZE_TABLET = 15,
   COL_SIZE_TABLET = 15,
   ROW_SIZE_MOBILE = 18,
@@ -199,8 +199,10 @@ class Grid extends Component {
       // In mobile, we pick either the first 3 rows or the last 3 rows to be the startNode and endNode's positions.
       // e.g. startNode can either be on the top or bottom 3 rows - the endNode gets to be in the other end
       // First, we pick either the top or bottom for startNode
+      let choice = 0;
       if (this.props.isMobile()) {
-        const choice = Math.floor(Math.random * 1);
+        choice = Math.round(Math.random());
+        console.log(choice);
         if (choice === 0) {
           startNode = this.randomiseNodePosition(0, 3, 0, cols, startNode); // start will be in the top rows
           finishNode = this.randomiseNodePosition(
@@ -222,7 +224,8 @@ class Grid extends Component {
         }
       } else {
         // the screen is either desktop or tablet mode
-        const choice = Math.floor(Math.random * 1);
+        choice = Math.round(Math.random());
+        console.log(choice);
         if (choice === 0) {
           startNode = this.randomiseNodePosition(0, rows, 0, 5, startNode); // start will be in the top rows
           finishNode = this.randomiseNodePosition(
