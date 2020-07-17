@@ -3,7 +3,8 @@ import { withGetScreen } from "react-getscreen";
 import Node from "./Node";
 import "../css/Grid.css";
 import { Dijkstra } from "../algorithms/Dijkstra";
-import Card from "react-bootstrap/Card";
+import { BFS } from "../algorithms/BFS";
+import { DFS } from "../algorithms/DFS";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
@@ -12,12 +13,16 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
+import { IoIosBuild } from "react-icons/io";
+import { MdBorderClear } from "react-icons/md";
+import { FiPlay, FiRefreshCw } from "react-icons/fi";
+
 // Constants
-const ROW_SIZE_DESKTOP = 20,
-  COL_SIZE_DESKTOP = 40,
+const ROW_SIZE_DESKTOP = 10,
+  COL_SIZE_DESKTOP = 10,
   ROW_SIZE_TABLET = 15,
   COL_SIZE_TABLET = 15,
-  ROW_SIZE_MOBILE = 18,
+  ROW_SIZE_MOBILE = 17,
   COL_SIZE_MOBILE = 10,
   START_NODE_COL = 0,
   START_NODE_ROW = 0,
@@ -37,7 +42,7 @@ class Grid extends Component {
       screenWidth: null,
       isRunning: false,
       canReset: true,
-      algorithmTitle: "Choose an algorithm",
+      algorithmTitle: "",
     };
     this.grid = React.createRef();
   }
@@ -80,6 +85,41 @@ class Grid extends Component {
   };
 
   /**
+   * This method uses BFS on the grid and shows the process visually.
+   */
+  handleBFS = () => {
+    this.setState(
+      {
+        isRunning: true,
+        canReset: false,
+      },
+      () => {
+        const { grid, startNodeCoords, finishNodeCoords } = this.state;
+        const startNode = grid[startNodeCoords.row][startNodeCoords.col];
+        const finishNode = grid[finishNodeCoords.row][finishNodeCoords.col];
+        const visitedNodes = BFS(startNode, finishNode, grid); // returns an array of visited nodes with the shortest path
+        this.showAnimation(visitedNodes, finishNode);
+      }
+    );
+  };
+
+  handleDFS = () => {
+    this.setState(
+      {
+        isRunning: true,
+        canReset: false,
+      },
+      () => {
+        const { grid, startNodeCoords, finishNodeCoords } = this.state;
+        const startNode = grid[startNodeCoords.row][startNodeCoords.col];
+        const finishNode = grid[finishNodeCoords.row][finishNodeCoords.col];
+        const visitedNodes = DFS(startNode, finishNode, grid); // returns an array of visited nodes
+        this.showAnimation(visitedNodes, finishNode);
+      }
+    );
+  };
+
+  /**
    * This method actually handles the animation of Dijkstra by editing the classNames of the nodes that were visited.
    * visitedNodes - array of nodes that were visited, retrieved from Dijkstra's Algorithm
    * finishNode - singular node object that marks the finish
@@ -89,8 +129,8 @@ class Grid extends Component {
       // we have completed the loop, now we animate the shortest path
       if (i === visitedNodes.length) {
         setTimeout(() => {
-          this.getShortestPath(finishNode);
-        }, 10 * i);
+          this.getPath(finishNode);
+        }, 30 * i);
         return;
       }
 
@@ -101,17 +141,17 @@ class Grid extends Component {
         document
           .getElementById(`row-${row}-col-${col}`)
           .classList.add("node-visited");
-      }, 10 * i);
+      }, 30 * i);
     }
   };
 
   /**
-   * This method finds the shortest path by using the node object's LastVisited property.
+   * This method finds the path taken by using the node object's LastVisited property.
    * It begins with the finishNode and backtracks all the way to the startNode. It creates an array from all
    * the nodes from the finishNode to the startNode, then reverses that array.
    * finishNode - singular node object that marks the finish
    */
-  getShortestPath = (finishNode) => {
+  getPath = (finishNode) => {
     let shortestPathInOrder = [];
     if (finishNode.isVisited === false) {
       // if finishNode is blocked by walls
@@ -371,146 +411,281 @@ class Grid extends Component {
     this.setState({ mouseDown: true });
   };
 
+  start = () => {
+    let chosenAlgorithm = this.state.algorithmTitle;
+    console.log(chosenAlgorithm);
+
+    if (chosenAlgorithm === "Breadth-first Search") {
+      this.handleBFS();
+    } else if (chosenAlgorithm === "Depth-first Search") {
+      this.handleDFS();
+    } else if (chosenAlgorithm === "Dijkstra's Algorithm") {
+      this.handleVisualiseDijkstra();
+    }
+  };
+
   chooseAlgorithm = (name) => {
     this.setState({ algorithmTitle: name });
   };
 
   render() {
     const { grid } = this.state;
-    return (
-      <>
-        <Navbar
-          sticky="top"
-          collapseOnSelect
-          expand="lg"
-          bg="dark"
-          variant="dark"
-        >
-          <Navbar.Brand href="#home">
-            Pathfinder Visualiser by Martin Tiangco
-          </Navbar.Brand>
-          <Nav className="col-auto">
-            <NavDropdown
-              title={this.state.algorithmTitle}
-              id="collasible-nav-dropdown"
-            >
-              <NavDropdown.Item
-                onClick={() => this.chooseAlgorithm("Breadth-first Search")}
-                active={this.state.algorithmTitle === "Breadth-first Search"}
-                href="#"
+    let width = window.innerWidth;
+    if (width > 768) {
+      // desktop or tablet
+      return (
+        <>
+          <Navbar
+            className="navbar"
+            sticky="top"
+            collapseOnSelect
+            expand="lg"
+            bg="dark"
+            variant="dark"
+          >
+            <Navbar.Brand href="#home">
+              Pathfinder by Martin Tiangco
+            </Navbar.Brand>
+            <Nav className="col-auto">
+              <NavDropdown
+                title={this.state.algorithmTitle || "Choose an algorithm"}
+                id="collasible-nav-dropdown"
               >
-                Breadth-first Search
-              </NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item
-                onClick={() => this.chooseAlgorithm("Depth-first Search")}
-                active={this.state.algorithmTitle === "Depth-first Search"}
-                href="#"
+                <NavDropdown.Item
+                  onClick={() => this.chooseAlgorithm("Breadth-first Search")}
+                  active={this.state.algorithmTitle === "Breadth-first Search"}
+                  href="#"
+                >
+                  Breadth-first Search
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  onClick={() => this.chooseAlgorithm("Depth-first Search")}
+                  active={this.state.algorithmTitle === "Depth-first Search"}
+                  href="#"
+                >
+                  Depth-first Search
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  onClick={() => this.chooseAlgorithm("Dijkstra's Algorithm")}
+                  active={this.state.algorithmTitle === "Dijkstra's Algorithm"}
+                  href="#"
+                >
+                  Djikstra's Algorithm
+                </NavDropdown.Item>
+              </NavDropdown>
+            </Nav>
+            <Nav className="col-auto">
+              <Button
+                variant="success"
+                onClick={this.start}
+                disabled={
+                  this.state.isRunning || this.state.algorithmTitle === ""
+                }
               >
-                Depth-first Search
-              </NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item
-                onClick={() => this.chooseAlgorithm("Dijkstra's Algorithm")}
-                active={this.state.algorithmTitle === "Dijkstra's Algorithm"}
-                href="#"
+                > Start visualising!
+              </Button>
+            </Nav>
+            <Nav className="col-auto">
+              <Button
+                variant="info"
+                onClick={this.resetNodes}
+                disabled={!this.state.canReset}
               >
-                Djikstra's Algorithm
-              </NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item
-                onClick={() => this.chooseAlgorithm("A* Algorithm")}
-                active={this.state.algorithmTitle === "A* Algorithm"}
-                href="#"
+                Reset
+              </Button>
+            </Nav>
+            <Nav className="col-auto">
+              <Button
+                variant="info"
+                onClick={() => this.buildWalls(grid)}
+                disabled={this.state.isRunning}
               >
-                A* Algorithm
-              </NavDropdown.Item>
-            </NavDropdown>
-          </Nav>
-          <Nav className="col-auto">
-            <Button
-              variant="success"
-              onClick={this.handleVisualiseDijkstra}
-              disabled={this.state.isRunning}
-            >
-              Start visualising!
-            </Button>
-          </Nav>
-          <Nav className="col-auto">
-            <Button
-              variant="info"
-              onClick={this.resetNodes}
-              disabled={!this.state.canReset}
-            >
-              Reset
-            </Button>
-          </Nav>
-          <Nav className="col-auto">
-            <Button
-              variant="info"
-              onClick={() => this.buildWalls(grid)}
-              disabled={this.state.isRunning}
-            >
-              Build Walls
-            </Button>
-          </Nav>
-          <Nav className="col-auto">
-            <Button
-              variant="info"
-              onClick={() => this.clearWalls(grid)}
-              disabled={this.state.isRunning}
-            >
-              Clear Walls
-            </Button>
-          </Nav>
-        </Navbar>
-        <div className="grid" ref={this.grid}>
-          {grid.map((row, rowIdx) => {
-            return (
-              <div className="column" key={rowIdx}>
-                {row.map((node, nodeIdx) => {
-                  const {
-                    row,
-                    col,
-                    isStart,
-                    isFinish,
-                    isWall,
-                    isVisited,
-                  } = node;
-                  const { colSize } = this.state;
-                  return (
-                    <Node
-                      key={rowIdx * colSize + nodeIdx}
-                      row={row}
-                      col={col}
-                      isStart={isStart}
-                      isFinish={isFinish}
-                      isWall={isWall}
-                      isVisited={isVisited}
-                      onMouseDown={this.handleMouseDown}
-                      onMouseUp={this.handleMouseUp}
-                      onMouseEnter={this.handleMouseEnter}
-                    />
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
-        {/* Icons made by{" "}
-        <a
-          href="https://www.flaticon.com/authors/pixel-perfect"
-          title="Pixel perfect"
-        >
-          Pixel perfect
-        </a>{" "}
-        from{" "}
-        <a href="https://www.flaticon.com/" title="Flaticon">
-          {" "}
-          www.flaticon.com
-        </a> */}
-      </>
-    );
+                Build Walls
+              </Button>
+            </Nav>
+            <Nav className="col-auto">
+              <Button
+                variant="info"
+                onClick={() => this.clearWalls(grid)}
+                disabled={this.state.isRunning}
+              >
+                Clear Walls
+              </Button>
+            </Nav>
+          </Navbar>
+          <div className="grid" ref={this.grid}>
+            {grid.map((row, rowIdx) => {
+              return (
+                <div className="column" key={rowIdx}>
+                  {row.map((node, nodeIdx) => {
+                    const {
+                      row,
+                      col,
+                      isStart,
+                      isFinish,
+                      isWall,
+                      isVisited,
+                    } = node;
+                    const { colSize } = this.state;
+                    return (
+                      <Node
+                        key={rowIdx * colSize + nodeIdx}
+                        row={row}
+                        col={col}
+                        isStart={isStart}
+                        isFinish={isFinish}
+                        isWall={isWall}
+                        isVisited={isVisited}
+                        onMouseDown={this.handleMouseDown}
+                        onMouseUp={this.handleMouseUp}
+                        onMouseEnter={this.handleMouseEnter}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      );
+    } else {
+      // mobile
+      return (
+        <>
+          <Navbar
+            className="navbar"
+            sticky="top"
+            collapseOnSelect
+            bg="dark"
+            variant="dark"
+          >
+            <Container fluid>
+              <Row>
+                <Col className="col-2">
+                  <Button
+                    variant="info"
+                    onClick={() => this.buildWalls(grid)}
+                    disabled={this.state.isRunning}
+                  >
+                    <IoIosBuild />
+                  </Button>
+                </Col>
+                <Col>
+                  <Button
+                    variant="info"
+                    onClick={() => this.clearWalls(grid)}
+                    disabled={this.state.isRunning}
+                  >
+                    <MdBorderClear />
+                  </Button>
+                </Col>
+                <Col>
+                  <Button
+                    variant="info"
+                    onClick={this.resetNodes}
+                    disabled={!this.state.canReset}
+                  >
+                    <FiRefreshCw />
+                  </Button>
+                </Col>
+                <Col className="col-6">
+                  <Nav className="col-auto">
+                    <NavDropdown
+                      title={this.state.algorithmTitle || "Choose an algorithm"}
+                      id="nav-dropdown"
+                    >
+                      <NavDropdown.Item
+                        onClick={() =>
+                          this.chooseAlgorithm("Breadth-first Search")
+                        }
+                        active={
+                          this.state.algorithmTitle === "Breadth-first Search"
+                        }
+                        href="#"
+                      >
+                        Breadth-first Search
+                      </NavDropdown.Item>
+                      <NavDropdown.Divider />
+                      <NavDropdown.Item
+                        onClick={() =>
+                          this.chooseAlgorithm("Depth-first Search")
+                        }
+                        active={
+                          this.state.algorithmTitle === "Depth-first Search"
+                        }
+                        href="#"
+                      >
+                        Depth-first Search
+                      </NavDropdown.Item>
+                      <NavDropdown.Divider />
+                      <NavDropdown.Item
+                        onClick={() =>
+                          this.chooseAlgorithm("Dijkstra's Algorithm")
+                        }
+                        active={
+                          this.state.algorithmTitle === "Dijkstra's Algorithm"
+                        }
+                        href="#"
+                      >
+                        Djikstra's Algorithm
+                      </NavDropdown.Item>
+                    </NavDropdown>
+                  </Nav>
+                </Col>
+              </Row>
+            </Container>
+          </Navbar>
+          <div className="grid" ref={this.grid}>
+            {grid.map((row, rowIdx) => {
+              return (
+                <div className="column" key={rowIdx}>
+                  {row.map((node, nodeIdx) => {
+                    const {
+                      row,
+                      col,
+                      isStart,
+                      isFinish,
+                      isWall,
+                      isVisited,
+                    } = node;
+                    const { colSize } = this.state;
+                    return (
+                      <Node
+                        key={rowIdx * colSize + nodeIdx}
+                        row={row}
+                        col={col}
+                        isStart={isStart}
+                        isFinish={isFinish}
+                        isWall={isWall}
+                        isVisited={isVisited}
+                        onMouseDown={this.handleMouseDown}
+                        onMouseUp={this.handleMouseUp}
+                        onMouseEnter={this.handleMouseEnter}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+          <>
+            <Nav className="justify-content-center">
+              <Button
+                variant="success"
+                onClick={this.start}
+                disabled={
+                  this.state.isRunning || this.state.algorithmTitle === ""
+                }
+              >
+                <FiPlay /> Start visualising!
+              </Button>
+            </Nav>
+          </>
+        </>
+      );
+    }
   }
 }
 
