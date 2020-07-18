@@ -45,7 +45,7 @@
 .node-wall {
   background-color: #081b2e;
   animation-name: build;
-  animation-duration: 0.5s;
+  animation-duration: 0.2s;
   animation-timing-function: ease-out;
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
