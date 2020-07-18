@@ -2,11 +2,42 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 5% auto;
+  margin: 2% auto;
   pointer-events: none;
 }
 
 .column {
   height: 25px;
   margin-bottom: 10px;
+}
+
+/* The title "Pathfinder by Martin Tiangco" */
+
+.emphasis {
+  color: #fff66f;
+  font-weight: 500;
+}
+
+.title {
+  font-weight: 200;
+}
+
+/* Legend/Key at the bottom of the desktop screen */
+
+.key {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.key li {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.key-align {
+  padding-left: 20px;
+  font-weight: 500;
+  font-size: large;
 }
