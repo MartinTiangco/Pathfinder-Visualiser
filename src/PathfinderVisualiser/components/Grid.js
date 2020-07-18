@@ -405,7 +405,9 @@ class Grid extends Component {
 
     // toggle the wall property of the node
     let currentNode = grid[row][col];
-    currentNode.isWall = !currentNode.isWall;
+    if (!currentNode.isStart && !currentNode.isFinish) {
+      currentNode.isWall = !currentNode.isWall;
+    }
 
     this.setState({ mouseDown: false });
   };
@@ -417,7 +419,9 @@ class Grid extends Component {
     }
     // toggle the wall property of the node
     let currentNode = grid[row][col];
-    currentNode.isWall = !currentNode.isWall;
+    if (!currentNode.isStart && !currentNode.isFinish) {
+      currentNode.isWall = !currentNode.isWall;
+    }
 
     this.setState({ mouseDown: true });
   };
