@@ -16,7 +16,7 @@ import Col from "react-bootstrap/Col";
 
 import { IoIosBuild } from "react-icons/io";
 import { MdBorderClear } from "react-icons/md";
-import { FiPlay, FiRefreshCw } from "react-icons/fi";
+import { FiPlay, FiRefreshCw, FiInfo } from "react-icons/fi";
 
 // Constants
 const ROW_SIZE_DESKTOP = 18,
@@ -500,8 +500,9 @@ class Grid extends Component {
                 </NavDropdown.Item>
               </NavDropdown>
             </Nav>
-            <Nav className="col-auto">
+            <Nav className="mr-auto">
               <Button
+                className="mr-sm-2"
                 variant="success"
                 onClick={this.start}
                 disabled={
@@ -510,32 +511,34 @@ class Grid extends Component {
               >
                 <FiPlay /> Start visualising!
               </Button>
-            </Nav>
-            <Nav className="col-auto">
               <Button
+                className="mr-sm-2"
                 variant="info"
                 onClick={() => this.buildWalls(grid)}
                 disabled={this.state.isRunning}
               >
                 <IoIosBuild /> Build Walls
               </Button>
-            </Nav>
-            <Nav className="col-auto">
               <Button
+                className="mr-sm-2"
                 variant="info"
                 onClick={() => this.clearWalls(grid)}
                 disabled={this.state.isRunning}
               >
                 <MdBorderClear /> Clear Walls
               </Button>
-            </Nav>
-            <Nav className="col-auto">
               <Button
+                className="mr-sm-2"
                 variant="info"
                 onClick={this.resetNodes}
                 disabled={!this.state.canReset}
               >
                 <FiRefreshCw /> Reset
+              </Button>
+            </Nav>
+            <Nav>
+              <Button variant="info" onClick={this.showAbout}>
+                <FiInfo /> About
               </Button>
             </Nav>
           </Navbar>
@@ -696,19 +699,17 @@ class Grid extends Component {
               );
             })}
           </div>
-          <>
-            <Nav className="justify-content-center">
-              <Button
-                variant="success"
-                onClick={this.start}
-                disabled={
-                  this.state.isRunning || this.state.algorithmTitle === ""
-                }
-              >
-                <FiPlay /> Start visualising!
-              </Button>
-            </Nav>
-          </>
+          <Nav className="justify-content-center">
+            <Button
+              variant="success"
+              onClick={this.start}
+              disabled={
+                this.state.isRunning || this.state.algorithmTitle === ""
+              }
+            >
+              <FiPlay /> Start visualising!
+            </Button>
+          </Nav>
         </>
       );
     }
