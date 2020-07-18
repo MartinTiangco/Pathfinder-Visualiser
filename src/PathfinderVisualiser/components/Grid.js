@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { withGetScreen } from "react-getscreen";
 import Node from "./Node";
+import Key from "./Key";
 import "../css/Grid.css";
 import { Dijkstra } from "../algorithms/Dijkstra";
 import { BFS } from "../algorithms/BFS";
@@ -18,8 +19,8 @@ import { MdBorderClear } from "react-icons/md";
 import { FiPlay, FiRefreshCw } from "react-icons/fi";
 
 // Constants
-const ROW_SIZE_DESKTOP = 10,
-  COL_SIZE_DESKTOP = 10,
+const ROW_SIZE_DESKTOP = 18,
+  COL_SIZE_DESKTOP = 45,
   ROW_SIZE_TABLET = 15,
   COL_SIZE_TABLET = 15,
   ROW_SIZE_MOBILE = 17,
@@ -47,6 +48,9 @@ class Grid extends Component {
     this.grid = React.createRef();
   }
 
+  /**
+   * Collects the number of rows and cols depending on where you access the webpage (i.e. on desktop, mobile or tablet).
+   */
   componentDidMount() {
     const rowSize = this.props.isMobile()
       ? ROW_SIZE_MOBILE
@@ -68,7 +72,7 @@ class Grid extends Component {
   /**
    * This method uses Dijkstra's Algorithm on the grid and shows the process visually.
    */
-  handleVisualiseDijkstra = () => {
+  handleDijkstra = () => {
     this.setState(
       {
         isRunning: true,
@@ -103,6 +107,9 @@ class Grid extends Component {
     );
   };
 
+  /**
+   * This method uses DFS on the grid and shows the process visually.
+   */
   handleDFS = () => {
     this.setState(
       {
@@ -172,7 +179,7 @@ class Grid extends Component {
   };
 
   /**
-   * Once we have the shortest path, we animate it by using the class "node-path".
+   * Once we have the path we took, we animate it by using the class "node-path".
    */
   animatePath = (shortestPathInOrder) => {
     for (let i = 0; i <= shortestPathInOrder.length; i++) {
@@ -242,7 +249,6 @@ class Grid extends Component {
       let choice = 0;
       if (this.props.isMobile()) {
         choice = Math.round(Math.random());
-        console.log(choice);
         if (choice === 0) {
           startNode = this.randomiseNodePosition(0, 3, 0, cols, startNode); // start will be in the top rows
           finishNode = this.randomiseNodePosition(
@@ -265,7 +271,6 @@ class Grid extends Component {
       } else {
         // the screen is either desktop or tablet mode
         choice = Math.round(Math.random());
-        console.log(choice);
         if (choice === 0) {
           startNode = this.randomiseNodePosition(0, rows, 0, 5, startNode); // start will be in the top rows
           finishNode = this.randomiseNodePosition(
@@ -286,8 +291,6 @@ class Grid extends Component {
           finishNode = this.randomiseNodePosition(0, rows, 0, 5, finishNode); // finish will be in the top rows
         }
       }
-      console.log("Start node: " + startNode.row, startNode.col);
-      console.log("End node: " + finishNode.row, finishNode.col);
     }
 
     // creates the initial grid
@@ -389,12 +392,21 @@ class Grid extends Component {
     };
   };
 
+  /**
+   * The methods handleMouseUp, handleMouseDown, handleMouseEnter control the wall inputs from the user.
+   * @param {*} row
+   * @param {*} col
+   */
   handleMouseUp = (row, col) => {
     const { grid, mouseDown } = this.state;
     if (!mouseDown) {
       return;
     }
-    console.log("Mouse is up at", row, col);
+
+    // toggle the wall property of the node
+    let currentNode = grid[row][col];
+    currentNode.isWall = !currentNode.isWall;
+
     this.setState({ mouseDown: false });
   };
 
@@ -403,27 +415,36 @@ class Grid extends Component {
     if (!mouseDown) {
       return;
     }
-    console.log("Mouse enters", row, col);
-  };
+    // toggle the wall property of the node
+    let currentNode = grid[row][col];
+    currentNode.isWall = !currentNode.isWall;
 
-  handleMouseDown = (row, col) => {
-    console.log("Mouse is down at", row, col);
     this.setState({ mouseDown: true });
   };
 
+  handleMouseDown = (row, col) => {
+    this.setState({ mouseDown: true });
+  };
+
+  /**
+   * Starts the visualisation of the algorithm that was selected from the dropdown list.
+   */
   start = () => {
     let chosenAlgorithm = this.state.algorithmTitle;
-    console.log(chosenAlgorithm);
 
     if (chosenAlgorithm === "Breadth-first Search") {
       this.handleBFS();
     } else if (chosenAlgorithm === "Depth-first Search") {
       this.handleDFS();
     } else if (chosenAlgorithm === "Dijkstra's Algorithm") {
-      this.handleVisualiseDijkstra();
+      this.handleDijkstra();
     }
   };
 
+  /**
+   * Changes the state of algorithmTitle when selecting an algorithm option from the dropdown list
+   * @param {String} name
+   */
   chooseAlgorithm = (name) => {
     this.setState({ algorithmTitle: name });
   };
@@ -444,7 +465,10 @@ class Grid extends Component {
             variant="dark"
           >
             <Navbar.Brand href="#home">
-              Pathfinder by Martin Tiangco
+              <span className="title">
+                <span className="emphasis">Pathfinder Visualiser</span> by
+                Martin Tiangco
+              </span>
             </Navbar.Brand>
             <Nav className="col-auto">
               <NavDropdown
@@ -484,16 +508,7 @@ class Grid extends Component {
                   this.state.isRunning || this.state.algorithmTitle === ""
                 }
               >
-                > Start visualising!
-              </Button>
-            </Nav>
-            <Nav className="col-auto">
-              <Button
-                variant="info"
-                onClick={this.resetNodes}
-                disabled={!this.state.canReset}
-              >
-                Reset
+                <FiPlay /> Start visualising!
               </Button>
             </Nav>
             <Nav className="col-auto">
@@ -502,7 +517,7 @@ class Grid extends Component {
                 onClick={() => this.buildWalls(grid)}
                 disabled={this.state.isRunning}
               >
-                Build Walls
+                <IoIosBuild /> Build Walls
               </Button>
             </Nav>
             <Nav className="col-auto">
@@ -511,7 +526,16 @@ class Grid extends Component {
                 onClick={() => this.clearWalls(grid)}
                 disabled={this.state.isRunning}
               >
-                Clear Walls
+                <MdBorderClear /> Clear Walls
+              </Button>
+            </Nav>
+            <Nav className="col-auto">
+              <Button
+                variant="info"
+                onClick={this.resetNodes}
+                disabled={!this.state.canReset}
+              >
+                <FiRefreshCw /> Reset
               </Button>
             </Nav>
           </Navbar>
@@ -548,10 +572,12 @@ class Grid extends Component {
               );
             })}
           </div>
+          {/* Key/legend */}
+          <Key />
         </>
       );
     } else {
-      // mobile
+      // Mobile render
       return (
         <>
           <Navbar
