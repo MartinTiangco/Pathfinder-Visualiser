@@ -8,12 +8,12 @@
 }
 
 .node-start {
-  background-image: url("./../assets/start.png");
+  background-image: url("./../assets/startLocation.svg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
   animation-name: reveal;
-  animation-duration: 0.5s;
+  animation-duration: 0.6s;
   animation-delay: 0.25s;
   animation-timing-function: ease-out;
   animation-iteration-count: 3;
@@ -21,12 +21,12 @@
 }
 
 .node-finish {
-  background-image: url("./../assets/finish.png");
+  background-image: url("./../assets/treasureChest.svg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
   animation-name: reveal;
-  animation-duration: 0.5s;
+  animation-duration: 0.6s;
   animation-delay: 0.25s;
   animation-timing-function: ease-out;
   animation-iteration-count: 3;
@@ -35,7 +35,7 @@
 
 @keyframes reveal {
   0% {
-    transform: scale(2);
+    transform: scale(3);
   }
   100% {
     transform: scale(1);
@@ -44,11 +44,20 @@
 
 .node-wall {
   background-color: #081b2e;
-  animation-name: reveal;
+  animation-name: build;
   animation-duration: 0.5s;
   animation-timing-function: ease-out;
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
+}
+
+@keyframes build {
+  0% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .node-visited {
@@ -106,4 +115,40 @@
     transform: scale(1);
     background-color: #fff66f;
   }
+}
+
+/* Node styling on the Key/Legend on the bottom of the desktop screen */
+
+.node-key {
+  width: 30px;
+  height: 30px;
+  outline: 1px solid #757575;
+  display: inline-block;
+  pointer-events: auto;
+}
+
+.node-start-key {
+  background-image: url("./../assets/startLocation.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.node-finish-key {
+  background-image: url("./../assets/treasureChest.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.node-wall-key {
+  background-color: #081b2e;
+}
+
+.node-visited-key {
+  background-color: #00d386;
+}
+
+.node-path-key {
+  background-color: #fff66f;
 }
