@@ -21,8 +21,8 @@ import { FiPlay, FiRefreshCw, FiInfo } from "react-icons/fi";
 // Constants
 const ROW_SIZE_DESKTOP = 18,
   COL_SIZE_DESKTOP = 45,
-  ROW_SIZE_TABLET = 15,
-  COL_SIZE_TABLET = 15,
+  ROW_SIZE_TABLET = 12,
+  COL_SIZE_TABLET = 12,
   ROW_SIZE_MOBILE = 17,
   COL_SIZE_MOBILE = 10,
   START_NODE_COL = 0,
@@ -456,7 +456,7 @@ class Grid extends Component {
   render() {
     const { grid } = this.state;
     let width = window.innerWidth;
-    if (width > 768) {
+    if (width >= 768) {
       // desktop or tablet
       return (
         <>
@@ -594,81 +594,63 @@ class Grid extends Component {
             bg="dark"
             variant="dark"
           >
-            <Container fluid>
-              <Row>
-                <Col className="col-2">
-                  <Button
-                    variant="info"
-                    onClick={() => this.buildWalls(grid)}
-                    disabled={this.state.isRunning}
-                  >
-                    <IoIosBuild />
-                  </Button>
-                </Col>
-                <Col>
-                  <Button
-                    variant="info"
-                    onClick={() => this.clearWalls(grid)}
-                    disabled={this.state.isRunning}
-                  >
-                    <MdBorderClear />
-                  </Button>
-                </Col>
-                <Col>
-                  <Button
-                    variant="info"
-                    onClick={this.resetNodes}
-                    disabled={!this.state.canReset}
-                  >
-                    <FiRefreshCw />
-                  </Button>
-                </Col>
-                <Col className="col-6">
-                  <Nav className="col-auto">
-                    <NavDropdown
-                      title={this.state.algorithmTitle || "Choose an algorithm"}
-                      id="nav-dropdown"
-                    >
-                      <NavDropdown.Item
-                        onClick={() =>
-                          this.chooseAlgorithm("Breadth-first Search")
-                        }
-                        active={
-                          this.state.algorithmTitle === "Breadth-first Search"
-                        }
-                        href="#"
-                      >
-                        Breadth-first Search
-                      </NavDropdown.Item>
-                      <NavDropdown.Divider />
-                      <NavDropdown.Item
-                        onClick={() =>
-                          this.chooseAlgorithm("Depth-first Search")
-                        }
-                        active={
-                          this.state.algorithmTitle === "Depth-first Search"
-                        }
-                        href="#"
-                      >
-                        Depth-first Search
-                      </NavDropdown.Item>
-                      <NavDropdown.Divider />
-                      <NavDropdown.Item
-                        onClick={() =>
-                          this.chooseAlgorithm("Dijkstra's Algorithm")
-                        }
-                        active={
-                          this.state.algorithmTitle === "Dijkstra's Algorithm"
-                        }
-                        href="#"
-                      >
-                        Djikstra's Algorithm
-                      </NavDropdown.Item>
-                    </NavDropdown>
-                  </Nav>
-                </Col>
-              </Row>
-            </Container>
+            <Nav className="mr-auto">
+              <Button
+                className="mr-2"
+                variant="info"
+                onClick={() => this.buildWalls(grid)}
+                disabled={this.state.isRunning}
+              >
+                <IoIosBuild />
+              </Button>
+              <Button
+                className="mr-2"
+                variant="info"
+                onClick={() => this.clearWalls(grid)}
+                disabled={this.state.isRunning}
+              >
+                <MdBorderClear />
+              </Button>
+              <Button
+                className="mr-2"
+                variant="info"
+                onClick={this.resetNodes}
+                disabled={!this.state.canReset}
+              >
+                <FiRefreshCw />
+              </Button>
+            </Nav>
+
+            <Nav>
+              <NavDropdown
+                title={this.state.algorithmTitle || "Choose an algorithm"}
+                id="nav-dropdown"
+              >
+                <NavDropdown.Item
+                  onClick={() => this.chooseAlgorithm("Breadth-first Search")}
+                  active={this.state.algorithmTitle === "Breadth-first Search"}
+                  href="#"
+                >
+                  Breadth-first Search
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  onClick={() => this.chooseAlgorithm("Depth-first Search")}
+                  active={this.state.algorithmTitle === "Depth-first Search"}
+                  href="#"
+                >
+                  Depth-first Search
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item
+                  onClick={() => this.chooseAlgorithm("Dijkstra's Algorithm")}
+                  active={this.state.algorithmTitle === "Dijkstra's Algorithm"}
+                  href="#"
+                >
+                  Djikstra's Algorithm
+                </NavDropdown.Item>
+              </NavDropdown>
+            </Nav>
           </Navbar>
           <div className="grid" ref={this.grid}>
             {grid.map((row, rowIdx) => {
