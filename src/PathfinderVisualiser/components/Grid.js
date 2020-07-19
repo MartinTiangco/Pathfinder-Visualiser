@@ -464,12 +464,12 @@ class Grid extends Component {
     this.setState({ aboutShow: isVisible });
   };
 
-  // /**
-  //  * Shows the Tutorial modal.
-  //  */
-  // showTutorial = (isVisible) => {
-  //   this.setState({ tutorialShow: isVisible });
-  // };
+  /**
+   * Shows the Tutorial modal.
+   */
+  showTutorial = (isVisible) => {
+    this.setState({ tutorialShow: isVisible });
+  };
 
   render() {
     const { grid, aboutShow, tutorialShow } = this.state;
@@ -571,10 +571,10 @@ class Grid extends Component {
               </Button>
             </Nav>
           </Navbar>
-          {/* <TutorialModal
+          <TutorialModal
             show={tutorialShow}
             onHide={() => this.showTutorial(false)}
-          /> */}
+          />
           <InfoModal show={aboutShow} onHide={() => this.showAbout(false)} />
           <div className="grid" ref={this.grid}>
             {grid.map((row, rowIdx) => {

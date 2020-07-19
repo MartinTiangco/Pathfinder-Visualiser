@@ -17,7 +17,12 @@ export default function TutorialModal(props) {
           Tutorial
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body></Modal.Body>
+      <Modal.Body>
+        <p>
+          <b>No tutorial yet!</b>
+        </p>
+        <p>Stay tuned for later updates!</p>
+      </Modal.Body>
       <Modal.Footer>
         <Button onClick={props.onHide}>Close</Button>
       </Modal.Footer>
