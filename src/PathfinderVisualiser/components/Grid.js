@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { withGetScreen } from "react-getscreen";
 import Node from "./Node";
 import Key from "./Key";
+import InfoModal from "./InfoModal";
+import TutorialModal from "./TutorialModal";
 import "../css/Grid.css";
 import { Dijkstra } from "../algorithms/Dijkstra";
 import { BFS } from "../algorithms/BFS";
@@ -16,7 +18,7 @@ import Col from "react-bootstrap/Col";
 
 import { IoIosBuild } from "react-icons/io";
 import { MdBorderClear } from "react-icons/md";
-import { FiPlay, FiRefreshCw, FiInfo } from "react-icons/fi";
+import { FiPlay, FiRefreshCw, FiInfo, FiHelpCircle } from "react-icons/fi";
 
 // Constants
 const ROW_SIZE_DESKTOP = 18,
@@ -44,6 +46,8 @@ class Grid extends Component {
       isRunning: false,
       canReset: true,
       algorithmTitle: "",
+      aboutShow: false,
+      tutorialShow: false,
     };
     this.grid = React.createRef();
   }
@@ -453,8 +457,22 @@ class Grid extends Component {
     this.setState({ algorithmTitle: name });
   };
 
+  /**
+   * Shows the About modal.
+   */
+  showAbout = (isVisible) => {
+    this.setState({ aboutShow: isVisible });
+  };
+
+  // /**
+  //  * Shows the Tutorial modal.
+  //  */
+  // showTutorial = (isVisible) => {
+  //   this.setState({ tutorialShow: isVisible });
+  // };
+
   render() {
-    const { grid } = this.state;
+    const { grid, aboutShow, tutorialShow } = this.state;
     let width = window.innerWidth;
     if (width >= 768) {
       // desktop or tablet
@@ -541,11 +559,23 @@ class Grid extends Component {
               </Button>
             </Nav>
             <Nav>
-              <Button variant="info" onClick={this.showAbout}>
+              <Button
+                className="mr-sm-2"
+                variant="info"
+                onClick={() => this.showTutorial(true)}
+              >
+                <FiHelpCircle /> Tutorial
+              </Button>
+              <Button variant="info" onClick={() => this.showAbout(true)}>
                 <FiInfo /> About
               </Button>
             </Nav>
           </Navbar>
+          {/* <TutorialModal
+            show={tutorialShow}
+            onHide={() => this.showTutorial(false)}
+          /> */}
+          <InfoModal show={aboutShow} onHide={() => this.showAbout(false)} />
           <div className="grid" ref={this.grid}>
             {grid.map((row, rowIdx) => {
               return (
@@ -579,7 +609,6 @@ class Grid extends Component {
               );
             })}
           </div>
-          {/* Key/legend */}
           <Key />
         </>
       );
