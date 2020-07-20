@@ -399,8 +399,8 @@ class Grid extends Component {
    * @param {*} col
    */
   handleMouseUp = (row, col) => {
-    const { grid, mouseDown } = this.state;
-    if (!mouseDown) {
+    const { grid, mouseDown, isRunning } = this.state;
+    if (!mouseDown || isRunning) {
       return;
     }
 
@@ -414,8 +414,8 @@ class Grid extends Component {
   };
 
   handleMouseEnter = (row, col) => {
-    const { grid, mouseDown } = this.state;
-    if (!mouseDown) {
+    const { grid, mouseDown, isRunning } = this.state;
+    if (!mouseDown || isRunning) {
       return;
     }
     // toggle the wall property of the node
