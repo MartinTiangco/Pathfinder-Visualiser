@@ -18,11 +18,16 @@ import { MdBorderClear } from "react-icons/md";
 import { FiPlay, FiRefreshCw, FiInfo, FiHelpCircle } from "react-icons/fi";
 
 // Constants
-const START_NODE_COL = 0,
+const ROW_SIZE_DESKTOP = 18,
+  COL_SIZE_DESKTOP = 45,
+  ROW_SIZE_TABLET = 12,
+  COL_SIZE_TABLET = 12,
+  ROW_SIZE_MOBILE = 17,
+  COL_SIZE_MOBILE = 10,
+  START_NODE_COL = 0,
   START_NODE_ROW = 0,
   FINISH_NODE_COL = 1,
-  FINISH_NODE_ROW = 1,
-  WIDTH_BREAKPOINT = 1150;
+  FINISH_NODE_ROW = 1;
 
 class Grid extends Component {
   constructor(props) {
@@ -44,38 +49,26 @@ class Grid extends Component {
     this.grid = React.createRef();
   }
 
-  componentDidMount() {
-    window.addEventListener("resize", () => {
-      this.initialiseSize();
-    });
-    this.initialiseSize();
-  }
-
   /**
    * Collects the number of rows and cols depending on where you access the webpage (i.e. on desktop, mobile or tablet).
    */
-  initialiseSize = () => {
-    let rowSize = 0,
-      colSize = 0;
-
-    // Formula to determine how many columns the grid has
-    let width = window.innerWidth;
-    colSize = Math.floor((width - 50) / 35);
-
-    // Formula to determine how many roms the grid has
-    let height = window.innerHeight;
-    if (width <= WIDTH_BREAKPOINT) {
-      rowSize = Math.floor((height - 125) / 35);
-    } else {
-      rowSize = Math.floor((height - 250) / 35);
-    }
-
+  componentDidMount() {
+    const rowSize = this.props.isMobile()
+      ? ROW_SIZE_MOBILE
+      : this.props.isTablet()
+      ? ROW_SIZE_TABLET
+      : ROW_SIZE_DESKTOP;
+    const colSize = this.props.isMobile()
+      ? COL_SIZE_MOBILE
+      : this.props.isTablet()
+      ? COL_SIZE_TABLET
+      : COL_SIZE_DESKTOP;
     this.createInitialGrid(rowSize, colSize, true);
     this.setState({
       rowSize,
       colSize,
     });
-  };
+  }
 
   /**
    * This method uses Dijkstra's Algorithm on the grid and shows the process visually.
@@ -221,9 +214,20 @@ class Grid extends Component {
         node.classList.remove(`node-visited`);
       }
     }
-
-    this.initialiseSize();
+    const rowSize = this.props.isMobile()
+      ? ROW_SIZE_MOBILE
+      : this.props.isTablet()
+      ? ROW_SIZE_TABLET
+      : ROW_SIZE_DESKTOP;
+    const colSize = this.props.isMobile()
+      ? COL_SIZE_MOBILE
+      : this.props.isTablet()
+      ? COL_SIZE_TABLET
+      : COL_SIZE_DESKTOP;
+    this.createInitialGrid(rowSize, colSize, true);
     this.setState({
+      rowSize,
+      colSize,
       isRunning: false,
     });
   };
@@ -467,7 +471,7 @@ class Grid extends Component {
   render() {
     const { grid, aboutShow, tutorialShow } = this.state;
     let width = window.innerWidth;
-    if (width >= WIDTH_BREAKPOINT) {
+    if (width >= 768) {
       // desktop or tablet
       return (
         <>
