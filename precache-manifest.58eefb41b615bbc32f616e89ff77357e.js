@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "748b966dc54728636264d32c48cbf8b5",
+    "revision": "9a6933c6f2d2c8459971b0affc62c1bb",
     "url": "/Pathfinder-Visualiser/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Pathfinder-Visualiser/static/css/2.af3c1da9.chunk.css"
   },
   {
-    "revision": "15f89a535c964fe6c601",
+    "revision": "2cac262082ae49b0a78e",
     "url": "/Pathfinder-Visualiser/static/css/main.e4f17ff9.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Pathfinder-Visualiser/static/js/2.ea391964.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "15f89a535c964fe6c601",
-    "url": "/Pathfinder-Visualiser/static/js/main.1c963429.chunk.js"
+    "revision": "2cac262082ae49b0a78e",
+    "url": "/Pathfinder-Visualiser/static/js/main.e0006a69.chunk.js"
   },
   {
     "revision": "bc0dec198dafb6b357a7",
