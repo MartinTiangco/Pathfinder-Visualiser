@@ -558,7 +558,7 @@ class Grid extends Component {
             bg="dark"
             variant="dark"
           >
-            <Navbar.Brand href="#home">
+            <Navbar.Brand href="#">
               <span className="title">
                 <span className="emphasis">Pathfinder Visualiser</span> by
                 Martin Tiangco
