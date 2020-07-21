@@ -1,9 +1,4 @@
-import {
-  collectAllNodes,
-  sortByDistance,
-  updateUnvisited,
-  getUnvisitedNeighbours,
-} from "./Helpers";
+import { updateUnvisited, getUnvisitedNeighbours } from "./Helpers";
 
 /*
  * Returns a list of visited nodes with least cost by using the Dijkstra's algorithm.

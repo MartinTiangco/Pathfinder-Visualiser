@@ -402,7 +402,6 @@ class Grid extends Component {
       isRunning,
       movingStart,
       movingFinish,
-      previousNode,
     } = this.state;
     if (!mouseDown || isRunning) {
       return;
