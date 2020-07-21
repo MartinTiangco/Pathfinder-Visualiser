@@ -56,6 +56,16 @@ class Grid extends Component {
    * Collects the number of rows and cols depending on where you access the webpage (i.e. on desktop, mobile or tablet).
    */
   initialiseSize = () => {
+    const columns = this.grid.current.childNodes; // get iterable list of columns
+    for (const column of columns) {
+      // this returns HTML DOM elements with className = "column"
+      for (const node of column.childNodes) {
+        // iterate through the nodes in the DOM tree of the column
+        node.classList.remove(`node-path`);
+        node.classList.remove(`node-visited`);
+      }
+    }
+
     let rowSize = 0,
       colSize = 0;
 
