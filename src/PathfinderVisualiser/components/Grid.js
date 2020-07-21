@@ -413,6 +413,7 @@ class Grid extends Component {
 
     // if we are moving the start node, then when we lift up the mouse click, we place on that node.
     if (movingStart) {
+      currentNode.isWall = false;
       currentNode.isStart = true;
       this.setState({
         movingStart: false,
@@ -421,6 +422,7 @@ class Grid extends Component {
       });
     } else if (movingFinish) {
       // if we are moving the finish node, then when we lift up the mouse click, we place the finish on that node.
+      currentNode.isWall = false;
       currentNode.isFinish = true;
       this.setState({
         movingFinish: false,
