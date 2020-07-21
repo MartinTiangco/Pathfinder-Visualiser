@@ -81,6 +81,10 @@ class Grid extends Component {
       rowSize = Math.floor((height - 250) / 35);
     }
 
+    // defaults to row size and col size of 1
+    if (colSize < 1) colSize = 1;
+    if (rowSize < 1) rowSize = 1;
+
     this.createInitialGrid(rowSize, colSize, true);
     this.setState({
       rowSize,
