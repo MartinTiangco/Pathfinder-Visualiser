@@ -1,25 +1,40 @@
-import { collectAllNodes, sortByDistance, updateUnvisited } from "./Helpers";
+import {
+  collectAllNodes,
+  sortByDistance,
+  updateUnvisited,
+  getUnvisitedNeighbours,
+} from "./Helpers";
 
 /*
  * Returns a list of visited nodes with least cost by using the Dijkstra's algorithm.
  */
 export function BFS(startNode, finishNode, grid) {
-  let visitedNodes = [startNode];
+  let visitedNodes = [];
+  let unvisitedNodes = [startNode];
   startNode.distance = 0;
-  let unvisitedNodes = collectAllNodes(grid);
+
   while (unvisitedNodes.length > 0) {
-    sortByDistance(unvisitedNodes);
-    const closestNode = unvisitedNodes.shift(); // removes the first element of unvisitedNodes
+    // get the first element in the queue
+    let currentNode = unvisitedNodes.shift();
 
-    // if closestNode is a wall, we continue because we can't do anything about it
-    if (closestNode.isWall) continue;
+    if (currentNode.isVisited) continue;
 
-    if (closestNode.distance === Infinity) return visitedNodes;
+    // skip if the node is a wall
+    if (currentNode.isWall) continue;
 
-    closestNode.isVisited = true;
-    visitedNodes.push(closestNode);
-    if (closestNode === finishNode) break;
-    updateUnvisited(closestNode, grid);
+    currentNode.isVisited = true;
+    visitedNodes.push(currentNode);
+
+    // found the finish, can exit loop
+    if (currentNode === finishNode) break;
+
+    // find its unvisited neighbours and update the distance and lastVisited properties of the neighbours
+    let neighbourNodes = getUnvisitedNeighbours(currentNode, grid);
+    updateUnvisited(currentNode, grid);
+
+    // put the unvisited neighbours into the queue
+    unvisitedNodes = unvisitedNodes.concat(neighbourNodes);
+    console.log(unvisitedNodes);
   }
   return visitedNodes;
 }
