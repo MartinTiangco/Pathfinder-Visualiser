@@ -40,6 +40,7 @@ class Grid extends Component {
       algorithmTitle: "",
       aboutShow: false,
       tutorialShow: false,
+      previousNode: { row: 0, col: 0 },
     };
     this.grid = React.createRef();
   }
@@ -395,13 +396,40 @@ class Grid extends Component {
    * @param {*} col
    */
   handleMouseUp = (row, col) => {
-    const { grid, mouseDown, isRunning } = this.state;
+    const {
+      grid,
+      mouseDown,
+      isRunning,
+      movingStart,
+      movingFinish,
+      previousNode,
+    } = this.state;
     if (!mouseDown || isRunning) {
       return;
     }
 
-    // toggle the wall property of the node
+    // collect the current node for use
     let currentNode = grid[row][col];
+
+    // if we are moving the start node, then when we lift up the mouse click, we place on that node.
+    if (movingStart) {
+      currentNode.isStart = true;
+      this.setState({
+        movingStart: false,
+        previousNode: { row, col },
+        startNodeCoords: { row, col },
+      });
+    } else if (movingFinish) {
+      // if we are moving the finish node, then when we lift up the mouse click, we place the finish on that node.
+      currentNode.isFinish = true;
+      this.setState({
+        movingFinish: false,
+        previousNode: { row, col },
+        finishNodeCoords: { row, col },
+      });
+    }
+
+    // when we are drawing walls
     if (!currentNode.isStart && !currentNode.isFinish) {
       currentNode.isWall = !currentNode.isWall;
     }
@@ -410,13 +438,33 @@ class Grid extends Component {
   };
 
   handleMouseEnter = (row, col) => {
-    const { grid, mouseDown, isRunning } = this.state;
+    const {
+      grid,
+      mouseDown,
+      isRunning,
+      movingStart,
+      movingFinish,
+      previousNode,
+    } = this.state;
     if (!mouseDown || isRunning) {
       return;
     }
-    // toggle the wall property of the node
+
+    // collect the current node for use
     let currentNode = grid[row][col];
-    if (!currentNode.isStart && !currentNode.isFinish) {
+
+    // if we are moving the start node, we update the position to the current node and ensure that the previous node is no longer the start node.
+    if (movingStart) {
+      currentNode.isStart = true;
+      grid[previousNode.row][previousNode.col].isStart = false;
+      this.setState({ previousNode: { row, col } });
+    } else if (movingFinish) {
+      // same logic applies to the finish node as the start node
+      currentNode.isFinish = true;
+      grid[previousNode.row][previousNode.col].isFinish = false;
+      this.setState({ previousNode: { row, col } });
+    } else {
+      // otherwise we are drawing a wall
       currentNode.isWall = !currentNode.isWall;
     }
 
@@ -424,6 +472,22 @@ class Grid extends Component {
   };
 
   handleMouseDown = (row, col) => {
+    const { grid } = this.state;
+
+    // collect the current node for use
+    let currentNode = grid[row][col];
+
+    // if the node is the start node, we pick it up.
+    // We use the previousNode property to track the previous node we were on in the last iteration - so we can switch the previous node's "isStart" and "isFinish" property to the current node
+    if (currentNode.isStart) {
+      currentNode.isStart = false;
+      this.setState({ movingStart: true, previousNode: { row, col } });
+    } else if (currentNode.isFinish) {
+      // we pick up the finish node
+      currentNode.isFinish = false;
+      this.setState({ movingFinish: true, previousNode: { row, col } });
+    }
+
     this.setState({ mouseDown: true });
   };
 
