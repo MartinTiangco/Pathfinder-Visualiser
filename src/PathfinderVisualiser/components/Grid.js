@@ -756,20 +756,7 @@ class Grid extends Component {
                 </NavDropdown.Item>
               </NavDropdown>
             </Nav>
-            <Nav>
-              <Button
-                className="mr-sm-2"
-                variant="info"
-                onClick={() => this.showTutorial(true)}
-              >
-                <FiHelpCircle />
-              </Button>
-            </Nav>
           </Navbar>
-          <TutorialModal
-            show={tutorialShow}
-            onHide={() => this.showTutorial(false)}
-          />
           <div className="grid" ref={this.grid}>
             {grid.map((row, rowIdx) => {
               return (
