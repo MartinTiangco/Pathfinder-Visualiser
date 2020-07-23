@@ -487,7 +487,11 @@ class Grid extends Component {
   };
 
   handleMouseDown = (row, col) => {
-    const { grid } = this.state;
+    const { grid, isRunning } = this.state;
+
+    if (isRunning) {
+      return;
+    }
 
     // collect the current node for use
     let currentNode = grid[row][col];
