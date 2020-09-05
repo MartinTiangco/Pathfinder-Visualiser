@@ -21,7 +21,8 @@ This project is a visualisation of pathfinding algorithms present in many softwa
 - Generation of mazes with famous algorithms such as Kruskal and Prim
 - More pathfinding algorithms such as A*
 
-![Pathfinder Visualiser application photo](./img/demo.PNG)  
+![Pathfinder Visualiser application photo](./img/demo.PNG)
+![Visualiser in action](./img/demoInAction.PNG)
 
 ## Motivation
 I created this project with large inspiration from Clement Mihailescu. After watching his videos, I decided to give this a try - here is the finished product! I am very proud of the application and had a lot of fun building it, and I hope you have a fun time messing around with it. 
