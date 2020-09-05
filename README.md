@@ -10,6 +10,8 @@ This project is a visualisation of pathfinding algorithms present in many softwa
 ## How does it work?
 Initially you will be displayed with an empty 2-dimensional grid with the start and finish nodes. They are where the search starts and finishes respectively and are displayed by the person and the treasure chest icons. You can use the buttons in the navbar to create random walls and clear them. On desktop, you can also use the cursor on the empty squares/nodes and drag it to draw walls. You can also move the start and finish nodes around by clicking and dragging. Once you are happy with the grid, you can select an algorithm and start visualising!
 
+You will see the green nodes slowly fill up the adjacent nodes in the grid - this is the searching part. Once the green nodes find the finish node, then the yellow nodes will display the path the algorithm chose to get there. Note that this is not always the shortest path for Depth-first search. It is the shortest path for some algorithms however (like Dijkstra's and Breadth-first search).
+
 ![Pathfinder Visualiser application photo](./img/demo.PNG)
 ![Visualiser in action](./img/demoInAction.PNG)
 
