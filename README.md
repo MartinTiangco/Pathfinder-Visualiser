@@ -40,5 +40,8 @@ I created this project with large inspiration from Clement Mihailescu. After wat
 ### Additional libraries:
 - [React Bootstrap](https://react-bootstrap.github.io/) for the different components e.g. navbar, buttons, etc.
 
+### Project Management
+- Trello
+
 ## Attributions
 Icons I have used in the web application were made by Google and Pixel perfect from www.flaticon.com. 
